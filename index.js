@@ -1,9 +1,9 @@
-const WebSocket  = requires('ws');
+const WebSocket  = require('ws');
 
 const ws         = new WebSocket('wss://gateway.discord.gg/?v=9&encoding=json');
 let interval     = 0;
 
-const token      = '';
+const token      = 'bottoken';
 const payload    = {
   op:2,
   d: {
@@ -12,8 +12,18 @@ const payload    = {
     properties: {
        $os:     'linux',
        $browser:'chrome',
-       $device :'chrome'
-    }
+       $device :'chrome',
+       
+    },
+    presence: {
+      "activities": [{
+        "name": "Test",
+        "type": 1
+      }],
+      "status": "dnd",
+      "since": 91879201,
+      "afk": false
+    },
   }
 };
 
@@ -28,14 +38,18 @@ ws.on('message', function incoming(data) {
   switch(op) {
     case 10:
       const {heartbeat_interval} = d;
-      // const interval = heartbeat(heartbeat_interval);
+      const interval = heartbeat(heartbeat_interval);
       break;
   }
   switch(t) {
-    case 'MESSAGE_CREATE';
-      const author = d.message.author;
-      const content = d.content;
-      console.log(`${author}: ${content}`);
+    case 'MESSAGE_CREATE':
+      const author = d.author.username + '#' + d.author.discriminator;
+      if(d.author.bot !== true) {
+      console.log(`${author}:  ${d.content}`);
+      } else {
+        console.log(`${d.author.username} Named Bot sended a message`)
+      }
+
   }
     
 })
